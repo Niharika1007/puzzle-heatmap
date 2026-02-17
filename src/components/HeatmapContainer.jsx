@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import HeatmapGrid from "./HeatmapGrid"
 import {
   getAllActivity,
@@ -16,86 +16,149 @@ function HeatmapContainer() {
 
   const [activity, setActivity] = useState([])
   const [streak, setStreak] = useState(0)
+  const [loading, setLoading] = useState(true)
 
-  const loadActivity = useCallback(async () => {
 
-    const data = await getAllActivity()
+  // Proper async loader
+  const loadActivity = async () => {
 
-    setActivity(data)
+    try {
 
-    const map = activityToMap(data)
+      const data = await getAllActivity()
 
-    setStreak(calculateStreak(map))
+      setActivity(data || [])
 
-  }, [])
+      const map = activityToMap(data || [])
 
+      const streakCount = calculateStreak(map)
+
+      setStreak(streakCount)
+
+    }
+    catch (error) {
+
+      console.error("Error loading activity:", error)
+
+      setActivity([])
+      setStreak(0)
+
+    }
+    finally {
+
+      setLoading(false)
+
+    }
+
+  }
+
+
+  // Correct useEffect pattern
   useEffect(() => {
 
     loadActivity()
 
-  }, [loadActivity])
+  }, [])
+
 
   const completeToday = async () => {
 
-    await saveActivity({
+    try {
 
-      date: dayjs().format("YYYY-MM-DD"),
+      await saveActivity({
 
-      solved: true,
+        date: dayjs().format("YYYY-MM-DD"),
 
-      score: Math.floor(Math.random() * 100),
+        solved: true,
 
-      timeTaken: Math.floor(Math.random() * 300),
+        score: Math.floor(Math.random() * 100),
 
-      difficulty: Math.floor(Math.random() * 3) + 1
+        timeTaken: Math.floor(Math.random() * 300),
 
-    })
+        difficulty: Math.floor(Math.random() * 3) + 1
 
-    loadActivity()
+      })
+
+      await loadActivity()
+
+    }
+    catch (error) {
+
+      console.error("Error saving activity:", error)
+
+    }
 
   }
 
-  return (
-    <div className="bg-white p-6 rounded shadow inline-block">
 
-      <h2 className="text-lg font-semibold mb-3">
+  if (loading) {
+
+    return <div>Loading heatmap...</div>
+
+  }
+
+
+  return (
+
+    <div
+      style={{
+        background: "white",
+        padding: "20px",
+        borderRadius: "8px",
+        boxShadow: "0 0 5px rgba(0,0,0,0.1)"
+      }}
+    >
+
+      <h2>
 
         {activity.length} contributions in {dayjs().year()}
 
       </h2>
 
+
       <button
         onClick={completeToday}
-        className="bg-green-600 text-white px-3 py-1 rounded mb-4"
+        style={{
+          background: "green",
+          color: "white",
+          padding: "6px 12px",
+          border: "none",
+          borderRadius: "4px",
+          marginTop: "10px",
+          marginBottom: "10px",
+          cursor: "pointer"
+        }}
       >
+
         Complete Today Puzzle
+
       </button>
+
 
       <HeatmapGrid activity={activity} />
 
-      {/* legend */}
-      <div className="flex gap-1 mt-4 text-xs">
+
+      <div style={{ marginTop: "10px" }}>
 
         Less
 
-        <div className="w-[12px] h-[12px] bg-gray-200"></div>
-        <div className="w-[12px] h-[12px] bg-green-200"></div>
-        <div className="w-[12px] h-[12px] bg-green-400"></div>
-        <div className="w-[12px] h-[12px] bg-green-600"></div>
-        <div className="w-[12px] h-[12px] bg-green-800"></div>
+        <span style={{ marginLeft: "5px" }}></span>
 
         More
 
       </div>
 
-      <div className="mt-3">
+
+      <div style={{ marginTop: "10px" }}>
 
         🔥 Current streak: <b>{streak}</b> days
 
       </div>
 
+
     </div>
+
   )
+
 }
 
 export default HeatmapContainer

@@ -1,24 +1,35 @@
 import React from "react"
 import HeatmapCell from "./HeatmapCell"
-import { generateYearDays, activityToMap, getIntensity } from "../utils/heatmapUtils"
+import {
+  generateYearDays,
+  activityToMap,
+  getIntensity
+} from "../utils/heatmapUtils"
 
 function HeatmapGrid({ activity }) {
 
   const days = generateYearDays()
 
-  const activityMap = activityToMap(activity)
-
-  console.log("Days count:", days.length)
+  const activityMap = activityToMap(activity || [])
 
   return (
-    <div style={{ display: "flex", marginTop: "10px" }}>
 
-      {/* Labels */}
-      <div style={{
-        display: "grid",
-        gridTemplateRows: "repeat(7, 14px)",
-        marginRight: "5px"
-      }}>
+    <div
+      style={{
+        display: "flex",
+        marginTop: "10px"
+      }}
+    >
+
+      {/* Day labels */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: "repeat(7, 14px)",
+          marginRight: "6px",
+          fontSize: "10px"
+        }}
+      >
         <div>Mon</div>
         <div></div>
         <div>Wed</div>
@@ -28,19 +39,19 @@ function HeatmapGrid({ activity }) {
         <div></div>
       </div>
 
-      {/* Grid */}
+
+      {/* Heatmap grid */}
       <div
         style={{
           display: "grid",
           gridTemplateRows: "repeat(7, 14px)",
           gridAutoFlow: "column",
           gridAutoColumns: "14px",
-          gap: "3px",
-          border: "1px solid gray",
-          padding: "5px"
+          gap: "3px"
         }}
       >
-        {days.map(day => {
+
+        {days.map((day) => {
 
           const date = day.format("YYYY-MM-DD")
 
@@ -54,10 +65,13 @@ function HeatmapGrid({ activity }) {
           )
 
         })}
+
       </div>
 
     </div>
+
   )
+
 }
 
 export default HeatmapGrid

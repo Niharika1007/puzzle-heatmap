@@ -1,9 +1,8 @@
-import React from "react"
 import HeatmapContainer from "./components/HeatmapContainer"
 
 function App() {
   return (
-    <div className="p-6">
+    <div style={{ padding: "20px" }}>
       <HeatmapContainer />
     </div>
   )

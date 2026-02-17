@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 export function generateYearDays() {
 
   const start = dayjs().startOf("year")
+
   const end = dayjs().endOf("year")
 
   const days = []
@@ -25,10 +26,29 @@ export function activityToMap(activity) {
   const map = {}
 
   activity.forEach(item => {
+
     map[item.date] = item
+
   })
 
   return map
+}
+
+export function calculateStreak(map) {
+
+  let streak = 0
+
+  let current = dayjs()
+
+  while (map[current.format("YYYY-MM-DD")]?.solved) {
+
+    streak++
+
+    current = current.subtract(1, "day")
+
+  }
+
+  return streak
 }
 
 export function getIntensity(activity) {
