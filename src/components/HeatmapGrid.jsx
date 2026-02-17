@@ -1,5 +1,6 @@
-import React from "react"
+import React, { useMemo } from "react"
 import HeatmapCell from "./HeatmapCell"
+
 import {
   generateYearDays,
   activityToMap,
@@ -8,70 +9,82 @@ import {
 
 function HeatmapGrid({ activity }) {
 
-  const days = generateYearDays()
+  const days = useMemo(() => generateYearDays(), [])
 
-  const activityMap = activityToMap(activity || [])
+  const map = useMemo(() => activityToMap(activity), [activity])
+
 
   return (
 
-    <div
-      style={{
-        display: "flex",
-        marginTop: "10px"
-      }}
-    >
+    <div style={{ display:"flex" }}>
 
-      {/* Day labels */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: "repeat(7, 14px)",
-          marginRight: "6px",
-          fontSize: "10px"
-        }}
-      >
-        <div>Mon</div>
-        <div></div>
-        <div>Wed</div>
-        <div></div>
-        <div>Fri</div>
-        <div></div>
-        <div></div>
+
+      {/* WEEK LABELS */}
+
+      <div style={weekLabels}>
+
+        <span>Sun</span>
+        <span>Mon</span>
+        <span>Tue</span>
+        <span>Wed</span>
+        <span>Thu</span>
+        <span>Fri</span>
+        <span>Sat</span>
+
       </div>
 
 
-      {/* Heatmap grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateRows: "repeat(7, 14px)",
-          gridAutoFlow: "column",
-          gridAutoColumns: "14px",
-          gap: "3px"
-        }}
-      >
 
-        {days.map((day) => {
+      {/* GRID */}
 
-          const date = day.format("YYYY-MM-DD")
+      <div style={gridStyle}>
 
-          const activityDay = activityMap[date]
+        {days.map(day=>{
 
-          return (
+          const date=day.format("YYYY-MM-DD")
+
+          return(
+
             <HeatmapCell
               key={date}
-              intensity={getIntensity(activityDay)}
+              intensity={getIntensity(map[date])}
             />
+
           )
 
         })}
 
       </div>
 
+
     </div>
 
   )
 
 }
+
+
+const gridStyle={
+
+  display:"grid",
+  gridTemplateRows:"repeat(7,16px)",
+  gridAutoFlow:"column",
+  gridAutoColumns:"16px",
+  gap:"4px"
+
+}
+
+
+const weekLabels={
+
+  display:"grid",
+  gridTemplateRows:"repeat(7,16px)",
+  gap:"4px",
+  marginRight:"8px",
+  fontSize:"12px",
+  color:"#666"
+
+}
+
 
 export default HeatmapGrid

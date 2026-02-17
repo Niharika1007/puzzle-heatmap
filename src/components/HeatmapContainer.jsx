@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import HeatmapGrid from "./HeatmapGrid"
+import MonthLabels from "./MonthLabels"
+
 import {
   getAllActivity,
   saveActivity
@@ -19,141 +21,77 @@ function HeatmapContainer() {
   const [loading, setLoading] = useState(true)
 
 
-  // Proper async loader
-  const loadActivity = async () => {
+  // ✅ SAFE loading function
+  async function loadActivityData() {
 
     try {
 
       const data = await getAllActivity()
 
-      setActivity(data || [])
+      setActivity(data)
 
-      const map = activityToMap(data || [])
+      const map = activityToMap(data)
 
-      const streakCount = calculateStreak(map)
-
-      setStreak(streakCount)
+      setStreak(calculateStreak(map))
 
     }
-    catch (error) {
-
-      console.error("Error loading activity:", error)
-
-      setActivity([])
-      setStreak(0)
-
+    catch(err){
+      console.error(err)
     }
-    finally {
-
+    finally{
       setLoading(false)
-
     }
 
   }
 
 
-  // Correct useEffect pattern
+  // ✅ SAFE useEffect pattern
   useEffect(() => {
 
-    loadActivity()
+    loadActivityData()
 
   }, [])
 
 
-  const completeToday = async () => {
+  async function completeToday(){
 
-    try {
+    await saveActivity({
 
-      await saveActivity({
+      date: dayjs().format("YYYY-MM-DD"),
+      score: Math.floor(Math.random()*100),
+      solved: true
 
-        date: dayjs().format("YYYY-MM-DD"),
+    })
 
-        solved: true,
-
-        score: Math.floor(Math.random() * 100),
-
-        timeTaken: Math.floor(Math.random() * 300),
-
-        difficulty: Math.floor(Math.random() * 3) + 1
-
-      })
-
-      await loadActivity()
-
-    }
-    catch (error) {
-
-      console.error("Error saving activity:", error)
-
-    }
+    loadActivityData()
 
   }
 
 
-  if (loading) {
-
+  if(loading){
     return <div>Loading heatmap...</div>
-
   }
 
 
-  return (
+  return(
 
-    <div
-      style={{
-        background: "white",
-        padding: "20px",
-        borderRadius: "8px",
-        boxShadow: "0 0 5px rgba(0,0,0,0.1)"
-      }}
-    >
+    <div style={{padding:"20px"}}>
 
       <h2>
-
         {activity.length} contributions in {dayjs().year()}
-
       </h2>
 
-
-      <button
-        onClick={completeToday}
-        style={{
-          background: "green",
-          color: "white",
-          padding: "6px 12px",
-          border: "none",
-          borderRadius: "4px",
-          marginTop: "10px",
-          marginBottom: "10px",
-          cursor: "pointer"
-        }}
-      >
-
+      <button onClick={completeToday}>
         Complete Today Puzzle
-
       </button>
 
+      <MonthLabels/>
 
-      <HeatmapGrid activity={activity} />
+      <HeatmapGrid activity={activity}/>
 
-
-      <div style={{ marginTop: "10px" }}>
-
-        Less
-
-        <span style={{ marginLeft: "5px" }}></span>
-
-        More
-
+      <div>
+        🔥 Current streak: {streak}
       </div>
-
-
-      <div style={{ marginTop: "10px" }}>
-
-        🔥 Current streak: <b>{streak}</b> days
-
-      </div>
-
 
     </div>
 

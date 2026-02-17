@@ -20,7 +20,10 @@ export async function getAllActivity() {
 
 export async function saveActivity(activity) {
   const db = await initDB()
-
+  const existing = await db.get(STORE,activity.date)
+  
+  if (existing) return
+  
   await db.put(STORE, {
     ...activity,
     synced: false

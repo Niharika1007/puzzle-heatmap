@@ -1,8 +1,8 @@
 import React from "react"
 
-function HeatmapCell({ intensity = 0 }) {
+function HeatmapCell({ intensity }) {
 
-  const colors = [
+  const colors=[
     "#ebedf0",
     "#9be9a8",
     "#40c463",
@@ -10,16 +10,19 @@ function HeatmapCell({ intensity = 0 }) {
     "#216e39"
   ]
 
-  return (
-    <div
-      style={{
-        width: "12px",
-        height: "12px",
-        backgroundColor: colors[intensity] || "#ebedf0",
-        borderRadius: "2px"
-      }}
-    />
+  return(
+
+    <div style={{
+
+      width:"16px",
+      height:"16px",
+      background:colors[intensity],
+      borderRadius:"3px"
+
+    }}/>
+
   )
+
 }
 
 export default HeatmapCell
